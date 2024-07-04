@@ -22,92 +22,162 @@ class _FormPageState extends State<FormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Form Buat Barang Baru"),
+        title: const Text("Form Buat Barang Baru"),
+        backgroundColor: Colors.teal,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextFormField(
-              controller: nameController,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                hintText: "Masukkan Nama Barang",
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              Text(
+                "Nama Barang",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal,
+                ),
               ),
-            ),
-            TextFormField(
-              controller: qtyController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                hintText: "Masukkan jumlah barang",
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: nameController,
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.label, color: Colors.teal),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: "Masukkan Nama Barang",
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
               ),
-            ),
-            TextFormField(
-              controller: attrController,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                hintText: "Masukkan atribut",
+              const SizedBox(height: 16),
+              Text(
+                "Jumlah Barang",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal,
+                ),
               ),
-            ),
-            TextFormField(
-              controller: weightController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                hintText: "Masukkan berat",
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: qtyController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.numbers, color: Colors.teal),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: "Masukkan jumlah barang",
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                Uri url = Uri.parse("$baseUrl/stocks");
+              const SizedBox(height: 16),
+              Text(
+                "Atribut",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: attrController,
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.description, color: Colors.teal),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: "Masukkan atribut",
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Berat",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: weightController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.scale, color: Colors.teal),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: "Masukkan berat",
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    Uri url = Uri.parse("$baseUrl/stocks");
 
-                final data = {
-                  "name": nameController.text,
-                  "qty": int.parse(qtyController.text),
-                  "attr": attrController.text,
-                  "weight": int.parse(weightController.text),
-                };
+                    final data = {
+                      "name": nameController.text,
+                      "qty": int.parse(qtyController.text),
+                      "attr": attrController.text,
+                      "weight": int.parse(weightController.text),
+                    };
 
-                try {
-                  final response = await http.post(
-                    url,
-                    headers: {'Content-Type': 'application/json'},
-                    body: jsonEncode(data),
-                  );
+                    try {
+                      final response = await http.post(
+                        url,
+                        headers: {'Content-Type': 'application/json'},
+                        body: jsonEncode(data),
+                      );
 
-                  print('Response status: ${response.statusCode}');
-                  print('Response body: ${response.body}');
-
-                  if (response.statusCode == 200 || response.statusCode == 201) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        backgroundColor: Colors.green,
-                        content: Text("Barang Berhasil ditambahkan"),
-                      ),
-                    );
-                    widget.refreshData();
-                    Navigator.pop(context);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.red,
-                        content: Text("Gagal Menambahkan Barang: ${response.body}"),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  print('Error: $e');
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      backgroundColor: Colors.red,
-                      content: Text("Gagal Menambahkan Barang: Network error"),
+                      if (response.statusCode == 200 || response.statusCode == 201) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.green,
+                            content: const Text("Barang Berhasil ditambahkan"),
+                          ),
+                        );
+                        widget.refreshData();
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red,
+                            content: Text("Gagal Menambahkan Barang: ${response.body}"),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.red,
+                          content: const Text("Gagal Menambahkan Barang: Network error"),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    textStyle: const TextStyle(fontSize: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  );
-                }
-              },
-              child: Text("Kirim"),
-            ),
-          ],
+                  ),
+                  child: const Text("Kirim"),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

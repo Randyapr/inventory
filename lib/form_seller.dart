@@ -4,7 +4,7 @@ class FormSeller extends StatefulWidget {
   final Function(String, String, String, String) createSale;
   final VoidCallback refreshData;
 
-  FormSeller({required this.createSale, required this.refreshData});
+  const FormSeller({required this.createSale, required this.refreshData, Key? key}) : super(key: key);
 
   @override
   _FormSellerState createState() => _FormSellerState();
@@ -44,7 +44,7 @@ class _FormSellerState extends State<FormSeller> {
     );
     if (picked != null && picked != DateTime.now()) {
       setState(() {
-        _dateController.text = picked.toString().substring(0, 10);
+        _dateController.text = picked.toLocal().toString().split(' ')[0];
       });
     }
   }
@@ -60,9 +60,9 @@ class _FormSellerState extends State<FormSeller> {
       widget.refreshData(); // Refresh data on parent page
       Navigator.pop(context); // Navigate back to sales page
     } catch (e) {
-      // Handle error
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Gagal membuat transaksi: $e'),
+        backgroundColor: Colors.red,
       ));
     }
   }
@@ -71,78 +71,116 @@ class _FormSellerState extends State<FormSeller> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tambah Transaksi Penjualan'),
+        title: const Text('Tambah Transaksi Penjualan'),
+        backgroundColor: Colors.teal,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextFormField(
-                controller: _buyerController,
-                decoration: InputDecoration(labelText: 'Pembeli'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Pembeli wajib diisi';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Telepon'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Telepon wajib diisi';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _dateController,
-                keyboardType: TextInputType.datetime,
-                decoration: InputDecoration(
-                  labelText: 'Tanggal',
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildTextFormField(
+                  controller: _buyerController,
+                  label: 'Pembeli',
+                  icon: Icons.person,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Pembeli wajib diisi';
+                    }
+                    return null;
+                  },
+                ),
+                _buildTextFormField(
+                  controller: _phoneController,
+                  label: 'Telepon',
+                  icon: Icons.phone,
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Telepon wajib diisi';
+                    }
+                    return null;
+                  },
+                ),
+                _buildTextFormField(
+                  controller: _dateController,
+                  label: 'Tanggal',
+                  icon: Icons.calendar_today,
+                  keyboardType: TextInputType.datetime,
                   hintText: 'Pilih Tanggal',
                   suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
+                    icon: Icon(Icons.calendar_today, color: Colors.teal),
+                    onPressed: () => _selectDate(context),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Tanggal wajib diisi';
+                    }
+                    return null;
+                  },
+                ),
+                _buildTextFormField(
+                  controller: _statusController,
+                  label: 'Status',
+                  icon: Icons.check_circle,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Status wajib diisi';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: ElevatedButton(
                     onPressed: () {
-                      _selectDate(context);
+                      if (_formKey.currentState!.validate()) {
+                        _createSale();
+                      }
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      textStyle: const TextStyle(fontSize: 16),
+                    ),
+                    child: const Text('Submit'),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Tanggal wajib diisi';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _statusController,
-                decoration: InputDecoration(labelText: 'Status'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Status wajib diisi';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _createSale();
-                  }
-                },
-                child: Text('Submit'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    String? hintText,
+    Widget? suffixIcon,
+    required FormFieldValidator<String> validator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: Colors.teal),
+          hintText: hintText,
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          suffixIcon: suffixIcon,
+        ),
+        validator: validator,
       ),
     );
   }

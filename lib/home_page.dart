@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:inventory/page_transaksi.dart';
+import 'package:inventory/stok_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -48,7 +50,11 @@ class HomePage extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       // Navigate to another page, e.g., sales page
-                      Navigator.pushNamed(context, '/sales');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PageTransaksi()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
@@ -60,9 +66,13 @@ class HomePage extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      // Navigate to another page, e.g., stock page
-                      Navigator.pushNamed(context, '/stock');
+                     onPressed: () {
+                      // Navigate to another page, e.g., sales page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StokPage()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.greenAccent,
