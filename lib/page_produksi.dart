@@ -45,7 +45,7 @@ class _PageProduksiState extends State<PageProduksi> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Produksi'),
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.teal,
       ),
       body: Column(
         children: [
@@ -90,8 +90,8 @@ class _PageProduksiState extends State<PageProduksi> {
         onPressed: () {
           // Navigasi ke form produk baru
         },
-        backgroundColor: Colors.deepOrange,
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.teal,
+        child: const Icon(Icons.add_outlined),
       ),
     );
   }

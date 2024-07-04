@@ -143,7 +143,7 @@ class _PageTransaksiState extends State<PageTransaksi> {
 class SaleDetail extends StatelessWidget {
   final String id;
 
-  SaleDetail({required this.id});
+  const SaleDetail({required this.id, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -151,30 +151,108 @@ class SaleDetail extends StatelessWidget {
       future: ApiService().fetchSaleById(id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData) {
-          return Center(child: Text('Data not found.'));
-        } else {
           return Scaffold(
             appBar: AppBar(
-              title: Text(snapshot.data!.buyer),
+              title: const Text('Detail Penjualan'),
               backgroundColor: Colors.teal,
             ),
-            body: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text('Buyer: ${snapshot.data!.buyer}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  SizedBox(height: 8),
-                  Text('Phone: ${snapshot.data!.phone}'),
-                  SizedBox(height: 8),
-                  Text('Date: ${snapshot.data!.date}'),
-                  SizedBox(height: 8),
-                  Text('Status: ${snapshot.data!.status}'),
-                ],
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Detail Penjualan'),
+              backgroundColor: Colors.teal,
+            ),
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        } else if (!snapshot.hasData) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Detail Penjualan'),
+              backgroundColor: Colors.teal,
+            ),
+            body: const Center(child: Text('Data tidak ditemukan')),
+          );
+        } else {
+          final sale = snapshot.data!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Detail Penjualan: ${sale.buyer}'),
+              backgroundColor: Colors.teal,
+            ),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min, // Make the column as small as possible
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            Icon(Icons.person, color: Colors.teal),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Pembeli: ${sale.buyer}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Icon(Icons.phone, color: Colors.teal),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Telepon: ${sale.phone}',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today, color: Colors.teal),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Tanggal: ${sale.date}',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Icon(Icons.info, color: Colors.teal),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Status: ${sale.status}',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           );
