@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'home_page.dart';
-import 'page_produksi.dart';
-import 'page_seller.dart';
-import 'stok_page.dart';
+import 'package:inventory/home_page.dart';
+import 'package:inventory/page_produksi.dart';
+import 'package:inventory/page_transaksi.dart';
+import 'package:inventory/stok_page.dart';
 
 void main() => runApp(const BottomNavigationBarExampleApp());
 
@@ -19,7 +18,7 @@ class BottomNavigationBarExampleApp extends StatelessWidget {
 }
 
 class BottomNavigationBarExample extends StatefulWidget {
-  const BottomNavigationBarExample({super.key});
+  const BottomNavigationBarExample({Key? key}) : super(key: key);
 
   @override
   State<BottomNavigationBarExample> createState() =>
@@ -30,11 +29,11 @@ class _BottomNavigationBarExampleState
     extends State<BottomNavigationBarExample> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
+  static  final List<Widget> _widgetOptions = <Widget>[
     HomePage(),
     StokPage(),
     PageProduksi(),
-    PageSeller(),
+    PageTransaksi(),
   ];
 
   void _onItemTapped(int index) {
@@ -48,14 +47,14 @@ class _BottomNavigationBarExampleState
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 55, 55, 55),
-
         title: const Text(
           'Inventory App',
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _widgetOptions,
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -72,13 +71,13 @@ class _BottomNavigationBarExampleState
             label: 'Produksi',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.sell),
-            label: 'Seller',
+            icon: Icon(Icons.shopping_cart),
+            label: 'Sale',
           ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: const Color.fromARGB(255, 90, 66, 177),
-        unselectedItemColor: Colors.grey, // Set unselected icon color here
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),
     );

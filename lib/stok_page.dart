@@ -1,8 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:inventory/base_url.dart';
 import 'package:http/http.dart' as http;
+import 'package:inventory/base_url.dart';
 import 'package:inventory/formPage.dart';
 
 class StokPage extends StatefulWidget {
@@ -13,15 +12,27 @@ class StokPage extends StatefulWidget {
 }
 
 class _StokPage extends State<StokPage> {
-  List SemuaBarang = [];
+  List semuaBarang = [];
 
-  void getSemuaBarang() async{
-    Uri url = Uri.parse("$baseUrl/posts");
+  void getSemuaBarang() async {
+    Uri url = Uri.parse("$baseUrl/stocks");
     final response = await http.get(url);
 
-    setState(() {
-      SemuaBarang = jsonDecode(response.body);
-    });
+    if (response.statusCode == 200) {
+      var parsedResponse = jsonDecode(response.body);
+
+      setState(() {
+        semuaBarang = parsedResponse.reversed.toList();
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  void deleteBarang(String id) async {
+    Uri url = Uri.parse("$baseUrl/stocks/$id");
+    await http.delete(url);
+    getSemuaBarang();
   }
 
   @override
@@ -35,26 +46,50 @@ class _StokPage extends State<StokPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Stok"),
+        backgroundColor: Colors.teal,
       ),
-      body: ListView.builder(
-        itemCount: SemuaBarang.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              leading: Text(SemuaBarang[index]['userId'].toString()),
-              title: Text(SemuaBarang[index]['title']),
-              subtitle: Text(SemuaBarang[index]['body']),
-            ),
-          );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          getSemuaBarang();
         },
+        child: ListView.builder(
+          itemCount: semuaBarang.length,
+          itemBuilder: (context, index) {
+            return Card(
+              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: ListTile(
+                contentPadding: EdgeInsets.all(16),
+                leading: CircleAvatar(
+                  backgroundColor: Colors.teal,
+                  child: Text(semuaBarang[index]['qty'].toString(),
+                      style: TextStyle(color: Colors.white)),
+                ),
+                title: Text(semuaBarang[index]['name'],
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(semuaBarang[index]['attr']),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete, color: Colors.red),
+                  onPressed: () =>
+                      deleteBarang(semuaBarang[index]['id'].toString()),
+                ),
+              ),
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => formPage()),
-            );
+            MaterialPageRoute(
+                builder: (context) => FormPage(refreshData: getSemuaBarang)),
+          );
         },
+        backgroundColor: Colors.teal,
         child: const Icon(Icons.add_outlined),
       ),
     );

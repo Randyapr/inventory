@@ -1,1 +1,1 @@
-String baseUrl = "https://jsonplaceholder.typicode.com";
+String baseUrl = "https://api.kartel.dev";
