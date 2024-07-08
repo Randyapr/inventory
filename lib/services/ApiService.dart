@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:inventory/base_url.dart';
-import 'package:inventory/data_sale.dart';
+import 'package:inventory/services/base_url.dart';
+import 'package:inventory/services/data_sale.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {

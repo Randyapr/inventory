@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:inventory/services/ApiService.dart';
 import 'dart:convert';
-import 'form_produksi.dart';
-import 'package:inventory/base_url.dart';
+import 'form/form_produksi.dart';
+import 'package:inventory/services/base_url.dart';
 
 class PageProduksi extends StatefulWidget {
   const PageProduksi({super.key});

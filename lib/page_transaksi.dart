@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:inventory/data_sale.dart';
-import 'package:inventory/form_seller.dart';
+import 'package:inventory/services/data_sale.dart';
+import 'package:inventory/form/form_seller.dart';
 import 'package:inventory/services/ApiService.dart';
 
 class PageTransaksi extends StatefulWidget {
