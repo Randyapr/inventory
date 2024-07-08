@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:inventory/services/ApiService.dart';
 import 'dart:convert';
-
+import 'form_produksi.dart';
 import 'package:inventory/base_url.dart';
 
 class PageProduksi extends StatefulWidget {
@@ -15,6 +16,7 @@ class _PageProduksiState extends State<PageProduksi> {
   List produk = [];
   List filteredProduk = [];
   String searchQuery = '';
+  final ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -38,6 +40,46 @@ class _PageProduksiState extends State<PageProduksi> {
         return product['name'].toLowerCase().contains(query.toLowerCase());
       }).toList();
     });
+  }
+
+  Future<void> saveProduction(String name, double price, int qty, String attr, double weight) async {
+    try {
+      await apiService.saveProduction(name, price, qty, attr, weight);
+      getProduk();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menyimpan produksi: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> deleteProduction(String id) async {
+    try {
+      await apiService.deleteProduction(id);
+      getProduk();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menghapus produksi: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void navigateToForm() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FormProduksi(
+          saveProduction: saveProduction,
+          refreshData: getProduk,
+        ),
+      ),
+    );
   }
 
   @override
@@ -78,7 +120,16 @@ class _PageProduksiState extends State<PageProduksi> {
                     ),
                     title: Text(filteredProduk[index]['name']),
                     subtitle: Text('Harga: ${filteredProduk[index]['price']}'),
-                    trailing: Icon(Icons.chevron_right),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => deleteProduction(filteredProduk[index]['id'].toString()),
+                        ),
+                        Icon(Icons.chevron_right),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -87,9 +138,7 @@ class _PageProduksiState extends State<PageProduksi> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigasi ke form produk baru
-        },
+        onPressed: navigateToForm,
         backgroundColor: Colors.teal,
         child: const Icon(Icons.add_outlined),
       ),

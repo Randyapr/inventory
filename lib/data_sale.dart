@@ -15,11 +15,11 @@ class Sale {
 
   factory Sale.fromJson(Map<String, dynamic> json) {
     return Sale(
-      id: json['id'] ?? '',  // Add default value
-      buyer: json['buyer'] ?? 'Unknown Buyer',  // Add default value
-      phone: json['phone'] ?? 'Unknown Phone',  // Add default value
-      date: json['date'] ?? 'Unknown Date',  // Add default value
-      status: json['status'] ?? 'Unknown Status',  // Add default value
+      id: json['id'] ?? '',  
+      buyer: json['buyer'] ?? 'Unknown Buyer',  
+      phone: json['phone'] ?? 'Unknown Phone',  
+      date: json['date'] ?? 'Unknown Date',  
+      status: json['status'] ?? 'Unknown Status',  
     );
   }
 }

@@ -1,67 +1,57 @@
 import 'package:flutter/material.dart';
 
-class FormSeller extends StatefulWidget {
-  final Future<void> Function(String, String, String, String) createSale;
+class FormProduksi extends StatefulWidget {
+  final Future<void> Function(String, double, int, String, double) saveProduction;
   final VoidCallback refreshData;
 
-  const FormSeller({required this.createSale, required this.refreshData, Key? key}) : super(key: key);
+  const FormProduksi({required this.saveProduction, required this.refreshData, super.key});
 
   @override
-  _FormSellerState createState() => _FormSellerState();
+  _FormProduksiState createState() => _FormProduksiState();
 }
 
-class _FormSellerState extends State<FormSeller> {
+class _FormProduksiState extends State<FormProduksi> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _buyerController;
-  late TextEditingController _phoneController;
-  late TextEditingController _dateController;
-  late TextEditingController _statusController;
+  late TextEditingController _nameController;
+  late TextEditingController _priceController;
+  late TextEditingController _qtyController;
+  late TextEditingController _attrController;
+  late TextEditingController _weightController;
 
   @override
   void initState() {
     super.initState();
-    _buyerController = TextEditingController();
-    _phoneController = TextEditingController();
-    _dateController = TextEditingController();
-    _statusController = TextEditingController();
+    _nameController = TextEditingController();
+    _priceController = TextEditingController();
+    _qtyController = TextEditingController();
+    _attrController = TextEditingController();
+    _weightController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _buyerController.dispose();
-    _phoneController.dispose();
-    _dateController.dispose();
-    _statusController.dispose();
+    _nameController.dispose();
+    _priceController.dispose();
+    _qtyController.dispose();
+    _attrController.dispose();
+    _weightController.dispose();
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2015, 8),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null) {
-      setState(() {
-        _dateController.text = picked.toLocal().toString().split(' ')[0];
-      });
-    }
-  }
-
-  Future<void> _createSale() async {
+  Future<void> _saveProduction() async {
     try {
-      await widget.createSale(
-        _buyerController.text,
-        _phoneController.text,
-        _dateController.text,
-        _statusController.text,
+      await widget.saveProduction(
+        _nameController.text,
+        double.parse(_priceController.text),
+        int.parse(_qtyController.text),
+        _attrController.text,
+        double.parse(_weightController.text),
       );
       widget.refreshData(); // Refresh data on parent page
-      Navigator.pop(context); // Navigate back to sales page
+      Navigator.pop(context); // Navigate back to production page
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Gagal membuat transaksi: $e'),
+        content: Text('Gagal menyimpan produksi: $e'),
         backgroundColor: Colors.red,
       ));
     }
@@ -71,7 +61,7 @@ class _FormSellerState extends State<FormSeller> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Transaksi Penjualan'),
+        title: const Text('Tambah Produksi'),
         backgroundColor: Colors.teal,
       ),
       body: Padding(
@@ -83,52 +73,59 @@ class _FormSellerState extends State<FormSeller> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 _buildTextFormField(
-                  controller: _buyerController,
-                  label: 'Pembeli',
-                  icon: Icons.person,
+                  controller: _nameController,
+                  label: 'Nama Produk',
+                  icon: Icons.label,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Pembeli wajib diisi';
+                      return 'Nama produk wajib diisi';
                     }
                     return null;
                   },
                 ),
                 _buildTextFormField(
-                  controller: _phoneController,
-                  label: 'Telepon',
-                  icon: Icons.phone,
-                  keyboardType: TextInputType.phone,
+                  controller: _priceController,
+                  label: 'Harga',
+                  icon: Icons.attach_money,
+                  keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Telepon wajib diisi';
+                      return 'Harga wajib diisi';
                     }
                     return null;
                   },
                 ),
                 _buildTextFormField(
-                  controller: _dateController,
-                  label: 'Tanggal',
-                  icon: Icons.calendar_today,
-                  keyboardType: TextInputType.datetime,
-                  hintText: 'Pilih Tanggal',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today, color: Colors.teal),
-                    onPressed: () => _selectDate(context),
-                  ),
+                  controller: _qtyController,
+                  label: 'Jumlah',
+                  icon: Icons.format_list_numbered,
+                  keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Tanggal wajib diisi';
+                      return 'Jumlah wajib diisi';
                     }
                     return null;
                   },
                 ),
                 _buildTextFormField(
-                  controller: _statusController,
-                  label: 'Status',
-                  icon: Icons.check_circle,
+                  controller: _attrController,
+                  label: 'Atribut',
+                  icon: Icons.info,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Status wajib diisi';
+                      return 'Atribut wajib diisi';
+                    }
+                    return null;
+                  },
+                ),
+                _buildTextFormField(
+                  controller: _weightController,
+                  label: 'Berat',
+                  icon: Icons.line_weight,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Berat wajib diisi';
                     }
                     return null;
                   },
@@ -138,7 +135,7 @@ class _FormSellerState extends State<FormSeller> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        _createSale();
+                        _saveProduction();
                       }
                     },
                     style: ElevatedButton.styleFrom(

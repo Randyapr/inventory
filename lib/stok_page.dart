@@ -13,6 +13,8 @@ class StokPage extends StatefulWidget {
 
 class _StokPage extends State<StokPage> {
   List semuaBarang = [];
+  List filteredBarang = [];
+  String searchQuery = '';
 
   void getSemuaBarang() async {
     Uri url = Uri.parse("$baseUrl/stocks");
@@ -23,6 +25,7 @@ class _StokPage extends State<StokPage> {
 
       setState(() {
         semuaBarang = parsedResponse.reversed.toList();
+        filteredBarang = semuaBarang;
       });
     } else {
       throw Exception('Failed to load data');
@@ -33,6 +36,15 @@ class _StokPage extends State<StokPage> {
     Uri url = Uri.parse("$baseUrl/stocks/$id");
     await http.delete(url);
     getSemuaBarang();
+  }
+
+  void filterBarang(String query) {
+    setState(() {
+      searchQuery = query;
+      filteredBarang = semuaBarang.where((barang) {
+        return barang['name'].toLowerCase().contains(query.toLowerCase());
+      }).toList();
+    });
   }
 
   @override
@@ -48,38 +60,57 @@ class _StokPage extends State<StokPage> {
         title: Text("Stok"),
         backgroundColor: Colors.teal,
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          getSemuaBarang();
-        },
-        child: ListView.builder(
-          itemCount: semuaBarang.length,
-          itemBuilder: (context, index) {
-            return Card(
-              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: ListTile(
-                contentPadding: EdgeInsets.all(16),
-                leading: CircleAvatar(
-                  backgroundColor: Colors.teal,
-                  child: Text(semuaBarang[index]['qty'].toString(),
-                      style: TextStyle(color: Colors.white)),
-                ),
-                title: Text(semuaBarang[index]['name'],
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(semuaBarang[index]['attr']),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
-                  onPressed: () =>
-                      deleteBarang(semuaBarang[index]['id'].toString()),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              onChanged: filterBarang,
+              decoration: InputDecoration(
+                hintText: 'Cari barang...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                getSemuaBarang();
+              },
+              child: ListView.builder(
+                itemCount: filteredBarang.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(16),
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.teal,
+                        child: Text(filteredBarang[index]['qty'].toString(),
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                      title: Text(filteredBarang[index]['name'],
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(filteredBarang[index]['attr']),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () =>
+                            deleteBarang(filteredBarang[index]['id'].toString()),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
